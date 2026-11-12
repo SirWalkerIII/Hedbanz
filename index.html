@@ -114,20 +114,20 @@ const DEFAULT_CARDS=[
 ["Waterfall","https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=700&auto=format&fit=crop"],
 ["Crown","https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=700&auto=format&fit=crop"]
 ];
-let supabase=null, roomId=null, roomCode=null, me=null, state=null, poller=null, toastTimer=null;
+let sbClient=null, roomId=null, roomCode=null, me=null, state=null, poller=null, toastTimer=null;
 function setConnection(s,t){$("connection").textContent=t;$("connection").className="connection "+s;}
 function showScreen(id){["configScreen","homeScreen","roomScreen"].forEach(x=>$(x).classList.toggle("hidden",x!==id));}
 function toast(s){$("toast").textContent=s;$("toast").classList.remove("hidden");clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").classList.add("hidden"),2500);}
 function err(id,e){$(id).textContent=e?.message||String(e||"");}
 function validImage(url){if(!url)return true;try{return ["http:","https:"].includes(new URL(url).protocol)}catch{return false}}
 async function rpc(name,args={}){
- const {data,error}=await supabase.rpc(name,args);if(error)throw error;return data;
+ const {data,error}=await sbClient.rpc(name,args);if(error)throw error;return data;
 }
 async function connect(url,key){
  if(!window.supabase)throw new Error("Supabase client library did not load. Check your internet connection and reload.");
- supabase=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
- const {data:sessionData,error:sessionError}=await supabase.auth.getSession();if(sessionError)throw sessionError;
- if(!sessionData.session){const {error}=await supabase.auth.signInAnonymously();if(error)throw error;}
+ sbClient=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ const {data:sessionData,error:sessionError}=await sbClient.auth.getSession();if(sessionError)throw sessionError;
+ if(!sessionData.session){const {error}=await sbClient.auth.signInAnonymously();if(error)throw error;}
  setConnection("ok","Connected");localStorage.setItem("hb_url",url);localStorage.setItem("hb_key",key);
 }
 async function init(){
