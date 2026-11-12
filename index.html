@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#20262e">
+<title>Hedbanz 2.0 — Party Game</title>
+<style>
+:root{color-scheme:dark;--bg:#171b21;--panel:#222a34;--panel2:#2b3541;--line:#3d4957;--text:#edf1f5;--muted:#aab5c1;--pink:#bf7a9e;--pink2:#dda5c0;--green:#8fc5a5;--red:#e5a0a7;--shadow:0 18px 55px #0005}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -15%,#3b4350 0,transparent 48%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}button,input{font:inherit}button{cursor:pointer;border:1px solid transparent;border-radius:12px;padding:10px 15px;background:var(--pink);color:#241923;font-weight:750;transition:.16s}button:hover{filter:brightness(1.1);transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}button.secondary{background:#35414e;color:var(--text);border-color:var(--line)}button.ghost{background:transparent;color:var(--muted);border-color:var(--line)}button.danger{background:#57373e;color:#ffe7e9;border-color:#80515c}.wrap{width:min(1080px,calc(100% - 30px));margin:auto;padding:27px 0 60px}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:27px}.brand{display:flex;gap:12px;align-items:center}.logo{width:43px;height:43px;border-radius:14px;background:#bf7a9e22;border:1px solid #bf7a9e77;color:var(--pink2);display:grid;place-items:center;font-size:25px}.brand h1{font-size:18px;margin:0;letter-spacing:.04em}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.13em}.connection{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:6px 10px;border-radius:99px}.connection.ok{color:var(--green);border-color:#8fc5a566}.connection.bad{color:var(--red);border-color:#e5a0a766}.screen{animation:up .28s ease both}.hidden{display:none!important}@keyframes up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}@keyframes glow{50%{box-shadow:0 0 0 9px #bf7a9e12}}h2{font-size:clamp(27px,4vw,37px);line-height:1.15;letter-spacing:-.035em;margin:0 0 8px}h3{margin:0 0 8px}.intro{color:var(--muted);margin:0 0 23px;max-width:650px}.panel{background:linear-gradient(145deg,#28313c,#202730);border:1px solid var(--line);border-radius:19px;padding:22px;box-shadow:var(--shadow)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{font-size:13px;font-weight:750;color:#d6dde5}.field input{width:100%;background:#171d24;border:1px solid var(--line);border-radius:11px;padding:11px 12px;color:var(--text);outline:none}.field input:focus{border-color:var(--pink);box-shadow:0 0 0 3px #bf7a9e22}.hint,.muted{font-size:12px;color:var(--muted)}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}.error{color:#ffb8c0;min-height:20px;font-size:13px;margin-top:10px}.divider{height:1px;background:var(--line);margin:19px 0}.note{background:#171d24;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--muted);font-size:12px;margin-top:17px}.roomhead{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:18px}.roomhead p{margin:4px 0;color:var(--muted)}.code{font:800 13px ui-monospace,monospace;letter-spacing:.12em;color:var(--pink2);border:1px solid #bf7a9e66;background:#bf7a9e18;border-radius:10px;padding:8px 11px;white-space:nowrap}.columns{display:grid;grid-template-columns:minmax(240px,.85fr) minmax(0,1.5fr);gap:16px;align-items:start}.sticky{position:sticky;top:15px}.players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.player{border:1px solid var(--line);background:#171d24;border-radius:13px;padding:12px;display:flex;align-items:center;gap:10px;min-width:0}.avatar{width:35px;height:35px;border-radius:11px;background:#bf7a9e22;color:var(--pink2);display:grid;place-items:center;font-weight:850;flex:none}.player strong{display:block;overflow-wrap:anywhere}.tag{font-size:10px;color:var(--green);letter-spacing:.08em;text-transform:uppercase}.tag.host{color:var(--pink2)}.cardgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.card{overflow:hidden;background:#171d24;border:1px solid var(--line);border-radius:14px;animation:up .25s ease both}.card img{width:100%;height:135px;object-fit:cover;display:block;background:#303a46}.card .fallback{height:100px;display:grid;place-items:center;font-size:36px;color:#aeb8c4}.card .cardbody{padding:11px 12px}.card .who{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;font-weight:800}.card .word{font-size:18px;font-weight:850;margin-top:3px}.secret{min-height:285px;border:1px solid #bf7a9e77;border-radius:16px;background:radial-gradient(circle at 50% 25%,#bf7a9e2b,transparent 55%),#171d24;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;margin:16px 0;padding:20px;animation:glow 3s infinite}.secret .q{font-size:90px;line-height:1;color:var(--pink2);font-weight:300}.secret strong{font-size:18px;margin-top:12px}.secret small{color:var(--muted);margin-top:4px}.your{text-align:center}.your .actions button{flex:1}.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:17px}.deckform{display:grid;grid-template-columns:1fr 1.4fr auto;gap:9px;align-items:end}.deckform .field input{min-width:0}.sectiontitle{display:flex;justify-content:space-between;align-items:center;gap:10px}.customlist{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.chip{font-size:12px;background:#171d24;border:1px solid var(--line);padding:6px 9px;border-radius:99px;color:#dce3eb}.chip button{background:none;color:var(--red);padding:0 0 0 7px;border:0}.modalback{position:fixed;inset:0;background:#07090dcc;display:grid;place-items:center;padding:18px;z-index:5}.modal{width:min(430px,100%);background:#28313c;border:1px solid var(--line);border-radius:19px;padding:23px;text-align:center;box-shadow:var(--shadow)}.modal p{color:var(--muted)}.modal .wordbig{font-size:clamp(30px,8vw,48px);font-weight:900;color:var(--pink2);margin:15px 0}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:8;background:#34404d;border:1px solid var(--line);border-radius:12px;padding:10px 14px;box-shadow:var(--shadow);font-size:13px}.empty{grid-column:1/-1;text-align:center;color:var(--muted);border:1px dashed var(--line);padding:23px;border-radius:13px}.foot{font-size:11px;color:var(--muted);margin-top:18px}
+@media(max-width:740px){.columns{grid-template-columns:1fr}.sticky{position:static}.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.players{grid-template-columns:1fr 1fr}}@media(max-width:440px){.players,.cardgrid{grid-template-columns:1fr}.deckform{grid-template-columns:1fr}.panel{padding:17px}.top{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div class="brand"><div class="logo">?</div><div><h1>HEDBANZ 2.0</h1><small>same room, different secrets</small></div></div><div id="connection" class="connection">Not connected</div></header>
+
+<section id="configScreen" class="screen">
+<h2>Connect your game.</h2><p class="intro">One shared room, private secret cards, and live updates for everyone on your call.</p>
+<div class="panel">
+<div class="grid">
+<div class="field full"><label for="supabaseUrl">Supabase project URL</label><input id="supabaseUrl" placeholder="https://your-project.supabase.co"></div>
+<div class="field full"><label for="supabaseKey">Supabase anon / publishable key</label><input id="supabaseKey" placeholder="sb_publishable_… or eyJ…"></div>
+</div>
+<div class="actions"><button id="saveConfig">Connect</button></div><div id="configError" class="error"></div>
+<div class="note">These are public client-side project settings, not a service-role key. Never paste your Supabase service-role key here. Connection settings are saved only in this browser.</div>
+</div>
+</section>
+
+<section id="homeScreen" class="screen hidden">
+<h2>Let's play.</h2><p class="intro">Create a private room or join friends with their invite code.</p>
+<div class="grid">
+<div class="panel">
+<h3>Create a room</h3><p class="muted">Start a new game and invite your friends.</p>
+<div class="field"><label for="createName">Your name</label><input id="createName" maxlength="24" placeholder="e.g. Alex"></div>
+<div class="actions"><button id="createRoom">Create room</button></div>
+</div>
+<div class="panel">
+<h3>Join a room</h3><p class="muted">Enter the room code shared by the host.</p>
+<div class="field"><label for="joinName">Your name</label><input id="joinName" maxlength="24" placeholder="e.g. Jamie"></div>
+<div class="field" style="margin-top:11px"><label for="joinCode">Room code</label><input id="joinCode" maxlength="12" placeholder="e.g. 4A8F2C"></div>
+<div class="actions"><button id="joinRoom">Join room</button></div>
+</div>
+</div>
+<div class="bar"><button class="ghost" id="changeConfig">Connection settings</button><span class="muted">Private rooms are accessible only with their invite code.</span></div><div id="homeError" class="error"></div>
+</section>
+
+<section id="roomScreen" class="screen hidden">
+<div class="roomhead"><div><h2 id="roomTitle">Room lobby</h2><p id="roomSubtitle">Waiting for players…</p></div><div class="code" id="roomCodeLabel">------</div></div>
+<div class="columns">
+<div class="panel sticky your">
+<div class="tag" id="phaseTag">LOBBY</div>
+<div id="secretPanel" class="hidden">
+<div class="secret"><div class="q">?</div><strong>Your Secret Card</strong><small>Keep this hidden until you've guessed it.</small></div>
+<button id="revealBtn" style="width:100%">Reveal my card</button>
+<p class="hint">A confirmation appears before showing your word.</p>
+</div>
+<div id="lobbyPanel">
+<h3>Players in the room</h3><p class="muted">Share the room code so friends can join.</p>
+<div class="actions"><button class="secondary" id="copyInvite">Copy invite link</button><button id="startGame">Start game</button></div>
+</div>
+<div class="divider"></div>
+<div class="sectiontitle"><h3>Players</h3><span class="muted" id="playerCount"></span></div>
+<div id="playerList" class="players" style="margin-top:12px"></div>
+<div class="foot" id="hostHint"></div>
+</div>
+<div class="panel">
+<div id="othersPanel">
+<div class="sectiontitle"><div><h3>Other players' cards</h3><p class="muted" id="roundLabel">Cards appear when the host starts.</p></div><span class="tag" id="roundBadge"></span></div>
+<div id="otherCards" class="cardgrid" style="margin-top:15px"></div>
+</div>
+<div class="divider"></div>
+<div class="sectiontitle"><div><h3>Community deck</h3><p class="muted">Everyone in this room can add cards.</p></div><span class="muted" id="deckCount"></span></div>
+<form id="addCardForm" class="deckform" style="margin-top:13px">
+<div class="field"><label for="newWord">Card word</label><input id="newWord" maxlength="60" placeholder="e.g. Red panda" required></div>
+<div class="field"><label for="newImage">Image URL (optional)</label><input id="newImage" type="url" placeholder="https://…"></div>
+<button type="submit">Add card</button>
+</form>
+<div id="customCards" class="customlist"></div>
+<div class="bar"><span class="muted">Deck changes are shared with everyone.</span><div class="actions" style="margin:0"><button class="secondary" id="nextRound">Next round</button><button class="ghost" id="leaveRoom">Leave room</button></div></div>
+<div id="roomError" class="error"></div>
+</div>
+</div>
+</section>
+</div>
+
+<div id="confirmModal" class="modalback hidden" role="dialog" aria-modal="true"><div class="modal"><h3>Ready to reveal?</h3><p>Only continue if you've already guessed your card. Anyone looking at your screen may see it.</p><div class="actions" style="justify-content:center"><button class="secondary" id="cancelReveal">Cancel</button><button id="confirmReveal">Reveal it</button></div></div></div>
+<div id="resultModal" class="modalback hidden" role="dialog" aria-modal="true"><div class="modal"><div class="tag">YOUR CARD WAS</div><div class="wordbig" id="revealedWord"></div><div id="revealedImage"></div><p>Close this when you're ready.</p><button id="closeResult">Close</button></div></div>
+<div id="toast" class="toast hidden"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const DEFAULT_CARDS=[
+["Astronaut","https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=700&auto=format&fit=crop"],
+["Dinosaur","https://images.unsplash.com/photo-1606857521015-7f9fcf423740?w=700&auto=format&fit=crop"],
+["Pizza","https://images.unsplash.com/photo-1513104890138-7c749659a591?w=700&auto=format&fit=crop"],
+["Penguin","https://images.unsplash.com/photo-1551986782-d0169b3f8fa7?w=700&auto=format&fit=crop"],
+["Volcano","https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=700&auto=format&fit=crop"],
+["Guitar","https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=700&auto=format&fit=crop"],
+["Cactus","https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=700&auto=format&fit=crop"],
+["Helicopter","https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=700&auto=format&fit=crop"],
+["Shark","https://images.unsplash.com/photo-1560275619-4662e36fa65c?w=700&auto=format&fit=crop"],
+["Castle","https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=700&auto=format&fit=crop"],
+["Robot","https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=700&auto=format&fit=crop"],
+["Ice Cream","https://images.unsplash.com/photo-1501446529957-6226bd447c46?w=700&auto=format&fit=crop"],
+["Lion","https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=700&auto=format&fit=crop"],
+["Train","https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=700&auto=format&fit=crop"],
+["Moon","https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=700&auto=format&fit=crop"],
+["Sunglasses","https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=700&auto=format&fit=crop"],
+["Octopus","https://images.unsplash.com/photo-1545670723-196ed0954986?w=700&auto=format&fit=crop"],
+["Skateboard","https://images.unsplash.com/photo-1520045892732-304bc3ac5d8e?w=700&auto=format&fit=crop"],
+["Waterfall","https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=700&auto=format&fit=crop"],
+["Crown","https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=700&auto=format&fit=crop"]
+];
+let supabase=null, roomId=null, roomCode=null, me=null, state=null, poller=null, toastTimer=null;
+function setConnection(s,t){$("connection").textContent=t;$("connection").className="connection "+s;}
+function showScreen(id){["configScreen","homeScreen","roomScreen"].forEach(x=>$(x).classList.toggle("hidden",x!==id));}
+function toast(s){$("toast").textContent=s;$("toast").classList.remove("hidden");clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").classList.add("hidden"),2500);}
+function err(id,e){$(id).textContent=e?.message||String(e||"");}
+function validImage(url){if(!url)return true;try{return ["http:","https:"].includes(new URL(url).protocol)}catch{return false}}
+async function rpc(name,args={}){
+ const {data,error}=await supabase.rpc(name,args);if(error)throw error;return data;
+}
+async function connect(url,key){
+ if(!window.supabase)throw new Error("Supabase client library did not load. Check your internet connection and reload.");
+ supabase=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ const {data:sessionData,error:sessionError}=await supabase.auth.getSession();if(sessionError)throw sessionError;
+ if(!sessionData.session){const {error}=await supabase.auth.signInAnonymously();if(error)throw error;}
+ setConnection("ok","Connected");localStorage.setItem("hb_url",url);localStorage.setItem("hb_key",key);
+}
+async function init(){
+ const url=localStorage.getItem("hb_url"),key=localStorage.getItem("hb_key");
+ if(url&&key){$("supabaseUrl").value=url;$("supabaseKey").value=key;try{await connect(url,key);showScreen("homeScreen");const q=new URLSearchParams(location.search).get("room");if(q)$("joinCode").value=q;}catch(e){setConnection("bad","Connection error");err("configError",e);showScreen("configScreen");}}
+ else showScreen("configScreen");
+}
+$("saveConfig").onclick=async()=>{err("configError","");try{await connect($("supabaseUrl").value.trim(),$("supabaseKey").value.trim());showScreen("homeScreen");}catch(e){setConnection("bad","Not connected");err("configError",e);}};
+$("changeConfig").onclick=()=>showScreen("configScreen");
+$("createRoom").onclick=async()=>{err("homeError","");try{const name=$("createName").value.trim();if(!name)throw Error("Enter your name.");const r=await rpc("hb_create_room",{p_name:name});roomId=r.room_id;roomCode=r.room_code;me=name;await seedDeck();await refresh();enterRoom();}catch(e){err("homeError",e);}};
+$("joinRoom").onclick=async()=>{err("homeError","");try{const name=$("joinName").value.trim(),code=$("joinCode").value.trim().toUpperCase();if(!name||!code)throw Error("Enter your name and room code.");const r=await rpc("hb_join_room",{p_code:code,p_name:name});roomId=r.room_id;roomCode=r.room_code;me=name;await refresh();enterRoom();}catch(e){err("homeError",e);}};
+async function seedDeck(){for(const [word,image] of DEFAULT_CARDS){try{await rpc("hb_add_card",{p_room_id:roomId,p_word:word,p_image_url:image});}catch(e){if(!String(e.message).toLowerCase().includes("already"))throw e;}}}
+function enterRoom(){showScreen("roomScreen");$("roomCodeLabel").textContent=roomCode;history.replaceState(null,"",location.pathname+"?room="+encodeURIComponent(roomCode));startPolling();}
+function startPolling(){if(poller)clearInterval(poller);refresh();poller=setInterval(()=>refresh().catch(e=>{setConnection("bad","Sync issue");err("roomError",e);}),2200);}
+async function refresh(){if(!roomId)return;const s=await rpc("hb_room_state",{p_room_id:roomId});state=s;render();}
+function render(){
+ if(!state)return;
+ $("roomTitle").textContent=state.room.status==="lobby"?"Room lobby":"Game in progress";
+ $("roomSubtitle").textContent=state.room.status==="lobby"?"Waiting for friends to join. The host can start when everyone is ready.":"Round "+state.room.round+" · ask questions on your voice call";
+ $("roomCodeLabel").textContent=state.room.code;
+ $("phaseTag").textContent=state.room.status==="lobby"?"LOBBY":"ROUND "+state.room.round;
+ $("playerCount").textContent=state.players.length+" joined";
+ $("hostHint").textContent=state.is_host?"You are the host. You can start the game and advance rounds.":"The host controls the game rounds.";
+ $("startGame").classList.toggle("hidden",!state.is_host||state.room.status!=="lobby");
+ $("lobbyPanel").classList.toggle("hidden",state.room.status!=="lobby");
+ $("secretPanel").classList.toggle("hidden",state.room.status==="lobby");
+ $("nextRound").classList.toggle("hidden",!state.is_host||state.room.status!=="playing");
+ $("roundLabel").textContent=state.room.status==="lobby"?"Cards appear when the host starts.":"Round "+state.room.round+" · your card is hidden from this page.";
+ $("roundBadge").textContent=state.room.status==="playing"?"ROUND "+state.room.round:"";
+ const list=$("playerList");list.innerHTML="";
+ state.players.forEach(p=>{const el=document.createElement("div");el.className="player";const av=document.createElement("div");av.className="avatar";av.textContent=p.name.slice(0,1).toUpperCase();const info=document.createElement("div");const n=document.createElement("strong");n.textContent=p.name+(p.is_me?" (you)":"");const tag=document.createElement("div");tag.className="tag "+(p.is_host?"host":"");tag.textContent=p.is_host?"HOST":p.is_me?"YOU":"IN ROOM";info.append(n,tag);el.append(av,info);list.append(el);});
+ const cards=$("otherCards");cards.innerHTML="";
+ const others=state.players.filter(p=>!p.is_me&&p.card);
+ if(state.room.status==="lobby")cards.innerHTML='<div class="empty">Your friends’ cards will appear here once the host starts the round.</div>';
+ else if(!others.length)cards.innerHTML='<div class="empty">No other players have a card yet.</div>';
+ else others.forEach(p=>cards.append(makeCard(p.name,p.card)));
+ $("deckCount").textContent=state.deck.length+" cards";
+ const custom=$("customCards");custom.innerHTML="";
+ state.deck.filter(c=>c.is_custom).forEach(c=>{const chip=document.createElement("span");chip.className="chip";chip.textContent=c.word; if(c.can_delete){const b=document.createElement("button");b.textContent="×";b.title="Remove card";b.onclick=()=>deleteCard(c.id);chip.append(b);}custom.append(chip);});
+}
+function makeCard(name,card){const a=document.createElement("article");a.className="card";if(card.image_url){const img=document.createElement("img");img.src=card.image_url;img.alt=card.word;img.loading="lazy";img.onerror=()=>{img.remove();const f=document.createElement("div");f.className="fallback";f.textContent="▧";a.prepend(f);};a.append(img);}else{const f=document.createElement("div");f.className="fallback";f.textContent="▧";a.append(f);}const body=document.createElement("div");body.className="cardbody";const who=document.createElement("div");who.className="who";who.textContent=name;const word=document.createElement("div");word.className="word";word.textContent=card.word;body.append(who,word);a.append(body);return a;}
+$("startGame").onclick=async()=>{err("roomError","");try{await rpc("hb_start_round",{p_room_id:roomId});await refresh();toast("Round started!");}catch(e){err("roomError",e);}};
+$("nextRound").onclick=async()=>{err("roomError","");try{await rpc("hb_next_round",{p_room_id:roomId});$("resultModal").classList.add("hidden");await refresh();toast("New round dealt!");}catch(e){err("roomError",e);}};
+$("addCardForm").onsubmit=async e=>{e.preventDefault();err("roomError","");const word=$("newWord").value.trim(),image=$("newImage").value.trim();try{if(!word)throw Error("Enter a card word.");if(!validImage(image))throw Error("Image URL must be a valid http or https link.");await rpc("hb_add_card",{p_room_id:roomId,p_word:word,p_image_url:image||null});$("newWord").value="";$("newImage").value="";await refresh();toast("Card added to the shared deck.");}catch(e){err("roomError",e);}};
+async function deleteCard(id){try{await rpc("hb_delete_card",{p_card_id:id});await refresh();toast("Card removed.");}catch(e){err("roomError",e);}}
+$("copyInvite").onclick=async()=>{const link=location.origin+location.pathname+"?room="+encodeURIComponent(roomCode);try{await navigator.clipboard.writeText(link);toast("Invite link copied.");}catch{toast("Room code: "+roomCode);}};
+$("leaveRoom").onclick=()=>{if(poller)clearInterval(poller);poller=null;roomId=null;roomCode=null;state=null;history.replaceState(null,"",location.pathname);showScreen("homeScreen");};
+$("revealBtn").onclick=()=>$("confirmModal").classList.remove("hidden");
+$("cancelReveal").onclick=()=>$("confirmModal").classList.add("hidden");
+$("confirmReveal").onclick=async()=>{try{$("confirmModal").classList.add("hidden");const c=await rpc("hb_reveal_my_card",{p_room_id:roomId});$("revealedWord").textContent=c.word;$("revealedImage").innerHTML="";if(c.image_url){const img=document.createElement("img");img.src=c.image_url;img.alt=c.word;img.style.cssText="max-width:100%;max-height:170px;border-radius:12px";$("revealedImage").append(img);} $("resultModal").classList.remove("hidden");}catch(e){err("roomError",e);}};
+$("closeResult").onclick=()=>$("resultModal").classList.add("hidden");
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("confirmModal").classList.add("hidden");$("resultModal").classList.add("hidden");}});
+init();
+</script>
+</body>
+</html>
