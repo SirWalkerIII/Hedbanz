@@ -73,7 +73,7 @@
 <div class="sectiontitle"><div><h3>Community deck</h3><p class="muted">Everyone in this room can add cards.</p></div><span class="muted" id="deckCount"></span></div>
 <form id="addCardForm" class="deckform" style="margin-top:13px">
 <div class="field"><label for="newWord">Card word</label><input id="newWord" maxlength="60" placeholder="e.g. Red panda" required></div>
-<div class="field"><label for="newImage">Image URL (optional)</label><input id="newImage" type="url" placeholder="https://…"></div>
+<div class="field"><label for="newImage">Image URL (optional)</label><input id="newImage" type="url" placeholder="Direct image URL (https://…)" ><span class="hint">Use a direct JPG, PNG, GIF, or WebP image link. A webpage link or protected image may not display.</span></div>
 <button type="submit">Add card</button>
 </form>
 <div id="customCards" class="customlist"></div>
@@ -114,7 +114,7 @@ const DEFAULT_CARDS=[
 ["Waterfall","https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=700&auto=format&fit=crop"],
 ["Crown","https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=700&auto=format&fit=crop"]
 ];
-let sbClient=null, roomId=null, roomCode=null, me=null, state=null, poller=null, toastTimer=null;
+let sbClient=null, roomId=null, roomCode=null, me=null, state=null, poller=null, toastTimer=null, renderedCardsSignature=null;
 function setConnection(s,t){$("connection").textContent=t;$("connection").className="connection "+s;}
 function showScreen(id){["configScreen","homeScreen","roomScreen"].forEach(x=>$(x).classList.toggle("hidden",x!==id));}
 function toast(s){$("toast").textContent=s;$("toast").classList.remove("hidden");clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").classList.add("hidden"),2500);}
@@ -125,7 +125,7 @@ async function rpc(name,args={}){
 }
 async function connect(url,key){
  if(!window.supabase)throw new Error("Supabase client library did not load. Check your internet connection and reload.");
- sbClient=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ sbClient=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.sessionStorage,storageKey:"hedbanz-auth"}});
  const {data:sessionData,error:sessionError}=await sbClient.auth.getSession();if(sessionError)throw sessionError;
  if(!sessionData.session){const {error}=await sbClient.auth.signInAnonymously();if(error)throw error;}
  setConnection("ok","Connected");localStorage.setItem("hb_url",url);localStorage.setItem("hb_key",key);
@@ -137,8 +137,8 @@ async function init(){
 }
 $("saveConfig").onclick=async()=>{err("configError","");try{await connect($("supabaseUrl").value.trim(),$("supabaseKey").value.trim());showScreen("homeScreen");}catch(e){setConnection("bad","Not connected");err("configError",e);}};
 $("changeConfig").onclick=()=>showScreen("configScreen");
-$("createRoom").onclick=async()=>{err("homeError","");try{const name=$("createName").value.trim();if(!name)throw Error("Enter your name.");const r=await rpc("hb_create_room",{p_name:name});roomId=r.room_id;roomCode=r.room_code;me=name;await seedDeck();await refresh();enterRoom();}catch(e){err("homeError",e);}};
-$("joinRoom").onclick=async()=>{err("homeError","");try{const name=$("joinName").value.trim(),code=$("joinCode").value.trim().toUpperCase();if(!name||!code)throw Error("Enter your name and room code.");const r=await rpc("hb_join_room",{p_code:code,p_name:name});roomId=r.room_id;roomCode=r.room_code;me=name;await refresh();enterRoom();}catch(e){err("homeError",e);}};
+$("createRoom").onclick=async()=>{err("homeError","");try{const name=$("createName").value.trim();if(!name)throw Error("Enter your name.");const r=await rpc("hb_create_room",{p_name:name});roomId=r.room_id;roomCode=r.room_code||r.code;me=name;await seedDeck();await refresh();enterRoom();}catch(e){err("homeError",e);}};
+$("joinRoom").onclick=async()=>{err("homeError","");try{const name=$("joinName").value.trim(),code=$("joinCode").value.trim().toUpperCase();if(!name||!code)throw Error("Enter your name and room code.");const r=await rpc("hb_join_room",{p_code:code,p_name:name});roomId=r.room_id;roomCode=r.room_code||r.code;me=name;await refresh();enterRoom();}catch(e){err("homeError",e);}};
 async function seedDeck(){for(const [word,image] of DEFAULT_CARDS){try{await rpc("hb_add_card",{p_room_id:roomId,p_word:word,p_image_url:image});}catch(e){if(!String(e.message).toLowerCase().includes("already"))throw e;}}}
 function enterRoom(){showScreen("roomScreen");$("roomCodeLabel").textContent=roomCode;history.replaceState(null,"",location.pathname+"?room="+encodeURIComponent(roomCode));startPolling();}
 function startPolling(){if(poller)clearInterval(poller);refresh();poller=setInterval(()=>refresh().catch(e=>{setConnection("bad","Sync issue");err("roomError",e);}),2200);}
@@ -159,22 +159,29 @@ function render(){
  $("roundBadge").textContent=state.room.status==="playing"?"ROUND "+state.room.round:"";
  const list=$("playerList");list.innerHTML="";
  state.players.forEach(p=>{const el=document.createElement("div");el.className="player";const av=document.createElement("div");av.className="avatar";av.textContent=p.name.slice(0,1).toUpperCase();const info=document.createElement("div");const n=document.createElement("strong");n.textContent=p.name+(p.is_me?" (you)":"");const tag=document.createElement("div");tag.className="tag "+(p.is_host?"host":"");tag.textContent=p.is_host?"HOST":p.is_me?"YOU":"IN ROOM";info.append(n,tag);el.append(av,info);list.append(el);});
- const cards=$("otherCards");cards.innerHTML="";
+ const cards=$("otherCards");
  const others=state.players.filter(p=>!p.is_me&&p.card);
- if(state.room.status==="lobby")cards.innerHTML='<div class="empty">Your friends’ cards will appear here once the host starts the round.</div>';
- else if(!others.length)cards.innerHTML='<div class="empty">No other players have a card yet.</div>';
- else others.forEach(p=>cards.append(makeCard(p.name,p.card)));
+ // The room polls every 2.2 seconds. Keep existing card DOM and image elements
+ // when the data has not changed, otherwise mobile browsers repeatedly restart images.
+ const cardsSignature=JSON.stringify({status:state.room.status,others:others.map(p=>({id:p.id,name:p.name,card:p.card}))});
+ if(cardsSignature!==renderedCardsSignature){
+   cards.innerHTML="";
+   if(state.room.status==="lobby")cards.innerHTML='<div class="empty">Your friends’ cards will appear here once the host starts the round.</div>';
+   else if(!others.length)cards.innerHTML='<div class="empty">No other players have a card yet.</div>';
+   else others.forEach(p=>cards.append(makeCard(p.name,p.card)));
+   renderedCardsSignature=cardsSignature;
+ }
  $("deckCount").textContent=state.deck.length+" cards";
  const custom=$("customCards");custom.innerHTML="";
  state.deck.filter(c=>c.is_custom).forEach(c=>{const chip=document.createElement("span");chip.className="chip";chip.textContent=c.word; if(c.can_delete){const b=document.createElement("button");b.textContent="×";b.title="Remove card";b.onclick=()=>deleteCard(c.id);chip.append(b);}custom.append(chip);});
 }
-function makeCard(name,card){const a=document.createElement("article");a.className="card";if(card.image_url){const img=document.createElement("img");img.src=card.image_url;img.alt=card.word;img.loading="lazy";img.onerror=()=>{img.remove();const f=document.createElement("div");f.className="fallback";f.textContent="▧";a.prepend(f);};a.append(img);}else{const f=document.createElement("div");f.className="fallback";f.textContent="▧";a.append(f);}const body=document.createElement("div");body.className="cardbody";const who=document.createElement("div");who.className="who";who.textContent=name;const word=document.createElement("div");word.className="word";word.textContent=card.word;body.append(who,word);a.append(body);return a;}
+function makeCard(name,card){const a=document.createElement("article");a.className="card";if(card.image_url){const img=document.createElement("img");img.src=card.image_url;img.alt=card.word;img.loading="eager";img.onerror=()=>{img.remove();const f=document.createElement("div");f.className="fallback";f.textContent="▧";a.prepend(f);};a.append(img);}else{const f=document.createElement("div");f.className="fallback";f.textContent="▧";a.append(f);}const body=document.createElement("div");body.className="cardbody";const who=document.createElement("div");who.className="who";who.textContent=name;const word=document.createElement("div");word.className="word";word.textContent=card.word;body.append(who,word);a.append(body);return a;}
 $("startGame").onclick=async()=>{err("roomError","");try{await rpc("hb_start_round",{p_room_id:roomId});await refresh();toast("Round started!");}catch(e){err("roomError",e);}};
 $("nextRound").onclick=async()=>{err("roomError","");try{await rpc("hb_next_round",{p_room_id:roomId});$("resultModal").classList.add("hidden");await refresh();toast("New round dealt!");}catch(e){err("roomError",e);}};
 $("addCardForm").onsubmit=async e=>{e.preventDefault();err("roomError","");const word=$("newWord").value.trim(),image=$("newImage").value.trim();try{if(!word)throw Error("Enter a card word.");if(!validImage(image))throw Error("Image URL must be a valid http or https link.");await rpc("hb_add_card",{p_room_id:roomId,p_word:word,p_image_url:image||null});$("newWord").value="";$("newImage").value="";await refresh();toast("Card added to the shared deck.");}catch(e){err("roomError",e);}};
 async function deleteCard(id){try{await rpc("hb_delete_card",{p_card_id:id});await refresh();toast("Card removed.");}catch(e){err("roomError",e);}}
 $("copyInvite").onclick=async()=>{const link=location.origin+location.pathname+"?room="+encodeURIComponent(roomCode);try{await navigator.clipboard.writeText(link);toast("Invite link copied.");}catch{toast("Room code: "+roomCode);}};
-$("leaveRoom").onclick=()=>{if(poller)clearInterval(poller);poller=null;roomId=null;roomCode=null;state=null;history.replaceState(null,"",location.pathname);showScreen("homeScreen");};
+$("leaveRoom").onclick=()=>{if(poller)clearInterval(poller);poller=null;roomId=null;roomCode=null;state=null;renderedCardsSignature=null;history.replaceState(null,"",location.pathname);showScreen("homeScreen");};
 $("revealBtn").onclick=()=>$("confirmModal").classList.remove("hidden");
 $("cancelReveal").onclick=()=>$("confirmModal").classList.add("hidden");
 $("confirmReveal").onclick=async()=>{try{$("confirmModal").classList.add("hidden");const c=await rpc("hb_reveal_my_card",{p_room_id:roomId});$("revealedWord").textContent=c.word;$("revealedImage").innerHTML="";if(c.image_url){const img=document.createElement("img");img.src=c.image_url;img.alt=c.word;img.style.cssText="max-width:100%;max-height:170px;border-radius:12px";$("revealedImage").append(img);} $("resultModal").classList.remove("hidden");}catch(e){err("roomError",e);}};
